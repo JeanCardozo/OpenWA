@@ -1,0 +1,26 @@
+# Nixpacks configuration for OpenWA on Railway.
+#
+# The default postinstall hook runs `cd dashboard && npm ci` (huge, takes
+# minutes, often times out on Railway's free tier — that's what's been
+# freezing every deploy). We skip it here because:
+#   1. The dashboard SPA is optional (only the embedded /dashboard UI
+#      uses it; the HTTP API works fine without it).
+#   2. The API itself is what the WhatsApp webhook needs.
+#   3. Railway builds the API via `nest build` (script "build"), which
+#      does not depend on the dashboard.
+#
+# If you ever need the dashboard on Railway, comment out the postinstall
+# override and Railway will run it normally.
+
+[variables]
+# Tell npm to skip lifecycle scripts (we run them explicitly in [phases.build]).
+NPM_CONFIG_PRODUCTION = "false"
+
+[phases.install]
+cmds = ["npm ci --ignore-scripts"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "node dist/main"
