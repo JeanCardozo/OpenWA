@@ -16,6 +16,7 @@ const mockEngineResult = { id: 'wa-msg-1', timestamp: 1706868000 };
 function createMockEngine() {
   return {
     sendTextMessage: jest.fn().mockResolvedValue(mockEngineResult),
+    sendTextMessageRaw: jest.fn().mockResolvedValue(mockEngineResult),
     sendImageMessage: jest.fn().mockResolvedValue(mockEngineResult),
     sendVideoMessage: jest.fn().mockResolvedValue(mockEngineResult),
     sendAudioMessage: jest.fn().mockResolvedValue(mockEngineResult),
@@ -140,6 +141,28 @@ describe('MessageService', () => {
       });
       await service.sendText('sess-1', input);
       expect(mockEngine.sendTextMessage).toHaveBeenCalledWith('120@g.us', 'hi @62811', ['62811@c.us']);
+    });
+
+    it('uses sendTextMessageRaw when forcePn=true, bypassing deliverable-JID resolution', async () => {
+      await service.sendText('sess-1', {
+        chatId: '573000000001@c.us',
+        text: 'raw force',
+        forcePn: true,
+      });
+
+      expect(mockEngine.sendTextMessageRaw).toHaveBeenCalledWith('573000000001@c.us', 'raw force');
+      expect(mockEngine.sendTextMessage).not.toHaveBeenCalled();
+    });
+
+    it('uses sendTextMessage (normal path) when forcePn is false/absent', async () => {
+      await service.sendText('sess-1', {
+        chatId: '573000000001@c.us',
+        text: 'normal',
+        forcePn: false,
+      });
+
+      expect(mockEngine.sendTextMessage).toHaveBeenCalledWith('573000000001@c.us', 'normal');
+      expect(mockEngine.sendTextMessageRaw).not.toHaveBeenCalled();
     });
 
     it('should save outgoing message as pending before sending, then update to sent', async () => {

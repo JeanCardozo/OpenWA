@@ -103,6 +103,7 @@ describe('BulkMessageService.processBatch', () => {
   let messageService: { saveOutgoingMessage: jest.Mock };
   let engine: {
     sendTextMessage: jest.Mock;
+    sendTextMessageRaw?: jest.Mock;
     sendImageMessage?: jest.Mock;
     sendVideoMessage?: jest.Mock;
     sendAudioMessage?: jest.Mock;

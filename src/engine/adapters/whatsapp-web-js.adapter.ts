@@ -1481,6 +1481,20 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
     return this.toMessageResult(msg);
   }
 
+  /**
+   * Send a text message using the raw chatId WITHOUT resolving it through resolveSendId /
+   * sendResolved. This bypasses the @c.us → @lid conversion and forces delivery to the
+   * phone-number JID as-is. Groups and non-@c.us JIDs pass through unchanged.
+   */
+  async sendTextMessageRaw(chatId: string, text: string, mentions?: string[]): Promise<MessageResult> {
+    this.ensureReady();
+    // SKIP sendResolved → send to the caller's exact chatId
+    const msg = mentions?.length
+      ? await this.client!.sendMessage(chatId, text, { mentions })
+      : await this.client!.sendMessage(chatId, text);
+    return this.toMessageResult(msg);
+  }
+
   async sendImageMessage(chatId: string, media: MediaInput): Promise<MessageResult> {
     return this.sendMediaMessage(chatId, media);
   }

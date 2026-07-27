@@ -548,6 +548,14 @@ export interface IWhatsAppEngine {
 
   // Messaging - Basic
   sendTextMessage(chatId: string, text: string, mentions?: string[]): Promise<MessageResult>;
+  /**
+   * Send a text message to the raw chatId WITHOUT resolving it through the engine's
+   * deliverable-JID pipeline (toDeliverableJid / resolveSendId). This forces delivery
+   * to the phone-number JID (`@c.us`) as-is, bypassing any @c.us → @lid conversion.
+   * Groups and non-@c.us JIDs are passed through unchanged by the adapter (they never
+   * hit the resolution path anyway), so the flag is harmless for them.
+   */
+  sendTextMessageRaw(chatId: string, text: string, mentions?: string[]): Promise<MessageResult>;
   sendImageMessage(chatId: string, media: MediaInput): Promise<MessageResult>;
   sendVideoMessage(chatId: string, media: MediaInput): Promise<MessageResult>;
   sendAudioMessage(chatId: string, media: MediaInput): Promise<MessageResult>;

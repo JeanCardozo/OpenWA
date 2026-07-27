@@ -74,10 +74,16 @@ export class MessageService {
 
     let result: MessageResult;
     try {
+      // When forcePn is true, bypass the engine's deliverable-JID pipeline (toDeliverableJid /
+      // resolveSendId) and send to the raw @c.us phone number as-is. This avoids the @c.us → @lid
+      // conversion that can route messages to bogus LIDs when the mapping cache is corrupt.
+      const send = finalDto.forcePn
+        ? engine.sendTextMessageRaw.bind(engine)
+        : engine.sendTextMessage.bind(engine);
       // Keep the 2-arg call shape for plain sends; only pass mentions when the caller supplied any.
       result = finalDto.mentions?.length
-        ? await engine.sendTextMessage(finalDto.chatId, finalDto.text, finalDto.mentions)
-        : await engine.sendTextMessage(finalDto.chatId, finalDto.text);
+        ? await send(finalDto.chatId, finalDto.text, finalDto.mentions)
+        : await send(finalDto.chatId, finalDto.text);
     } catch (error) {
       // The SEND itself failed — mark FAILED + fire message:failed (a post-send persistence fault is
       // handled separately by persistSentState and must NOT land here).

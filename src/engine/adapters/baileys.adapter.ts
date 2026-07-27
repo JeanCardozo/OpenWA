@@ -630,6 +630,33 @@ export class BaileysAdapter implements IWhatsAppEngine {
     };
   }
 
+  /**
+   * Send a text message using the raw chatId WITHOUT resolving it through toDeliverableJid.
+   * This bypasses the @c.us → @lid conversion and forces delivery to the phone-number JID as-is.
+   * Groups and non-@c.us JIDs pass through unchanged (sendMessage accepts them directly).
+   */
+  async sendTextMessageRaw(chatId: string, text: string, mentions?: string[]): Promise<MessageResult> {
+    this.ensureReady();
+    // SKIP toDeliverableJid — send to the caller's exact JID
+    const options = this.withEphemeral(chatId);
+    const content = { text, ...this.withMentions(mentions) };
+    const sent = options
+      ? await this.sock!.sendMessage(chatId, content, options)
+      : await this.sock!.sendMessage(chatId, content);
+    if (sent) {
+      void this.config.messageStore?.put(this.config.dbSessionId, sent).catch(err =>
+        this.logger.warn('Failed to persist sent message to store', {
+          error: err instanceof Error ? err.message : String(err),
+        }),
+      );
+      void this.emitOwnSendEcho(sent);
+    }
+    return {
+      id: sent?.key?.id ?? '',
+      timestamp: this.toUnixSeconds(sent?.messageTimestamp),
+    };
+  }
+
   async checkNumberExists(number: string): Promise<boolean> {
     return (await this.getNumberId(number)) !== null;
   }

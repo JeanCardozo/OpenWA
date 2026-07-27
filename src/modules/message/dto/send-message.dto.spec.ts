@@ -49,6 +49,52 @@ describe('SendTextMessageDto mentions', () => {
   });
 });
 
+describe('SendTextMessageDto forcePn', () => {
+  it('accepts forcePn=true', async () => {
+    const errors = await validateDto(SendTextMessageDto, {
+      chatId: '628123456789@c.us',
+      text: 'hello',
+      forcePn: true,
+    });
+    expect(errors).toHaveLength(0);
+  });
+
+  it('accepts forcePn=false', async () => {
+    const errors = await validateDto(SendTextMessageDto, {
+      chatId: '628123456789@c.us',
+      text: 'hello',
+      forcePn: false,
+    });
+    expect(errors).toHaveLength(0);
+  });
+
+  it('accepts missing forcePn (optional, backward compat)', async () => {
+    const errors = await validateDto(SendTextMessageDto, {
+      chatId: '628123456789@c.us',
+      text: 'hello',
+    });
+    expect(errors).toHaveLength(0);
+  });
+
+  it('rejects a non-boolean forcePn', async () => {
+    const errors = await validateDto(SendTextMessageDto, {
+      chatId: '628123456789@c.us',
+      text: 'hello',
+      forcePn: 'yes',
+    });
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('accepts string "true" as forcePn via ToStrictBoolean', async () => {
+    const errors = await validateDto(SendTextMessageDto, {
+      chatId: '628123456789@c.us',
+      text: 'hello',
+      forcePn: 'true',
+    });
+    expect(errors).toHaveLength(0);
+  });
+});
+
 describe('SendMediaMessageDto mentions', () => {
   it('accepts an optional array of mention WIDs', async () => {
     const errors = await validateDto(SendMediaMessageDto, {

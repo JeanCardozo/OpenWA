@@ -41,6 +41,24 @@ export class SendTextMessageDto {
   @IsString({ each: true })
   @MaxLength(64, { each: true })
   mentions?: string[];
+
+  /**
+   * When true, sends the message to the chatId AS-IS without resolving it through
+   * the engine's deliverable-JID pipeline (toDeliverableJid / resolveSendId).
+   * This bypasses the @c.us → @lid conversion and forces delivery to the raw
+   * phone-number JID. Only meaningful for 1:1 @c.us chats; groups and other
+   * JID dialects are unaffected.
+   *
+   * Default false: behaviour is unchanged.
+   */
+  @ApiPropertyOptional({
+    description: 'Force delivery to the raw @c.us phone number without LID resolution',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @ToStrictBoolean()
+  forcePn?: boolean;
 }
 
 export class SendMediaMessageDto {
