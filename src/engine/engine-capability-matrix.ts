@@ -209,7 +209,8 @@ export const ENGINE_CAPABILITY_MATRIX: Record<string, MethodCapability> = {
   sendTextMessageRaw: {
     wwjs: { status: 'supported' },
     baileys: { status: 'supported' },
-    evidence: 'Sends to the raw chatId without resolving through toDeliverableJid (baileys) or resolveSendId (wwjs); mirrors sendTextMessage body minus the JID-resolution step.',
+    evidence:
+      'Sends to the raw chatId without resolving through toDeliverableJid (baileys) or resolveSendId (wwjs); mirrors sendTextMessage body minus the JID-resolution step.',
   },
   sendVideoMessage: { wwjs: { status: 'supported' }, baileys: { status: 'supported' } },
   setGroupDescription: { wwjs: { status: 'supported' }, baileys: { status: 'supported' } },

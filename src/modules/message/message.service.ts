@@ -77,9 +77,7 @@ export class MessageService {
       // When forcePn is true, bypass the engine's deliverable-JID pipeline (toDeliverableJid /
       // resolveSendId) and send to the raw @c.us phone number as-is. This avoids the @c.us → @lid
       // conversion that can route messages to bogus LIDs when the mapping cache is corrupt.
-      const send = finalDto.forcePn
-        ? engine.sendTextMessageRaw.bind(engine)
-        : engine.sendTextMessage.bind(engine);
+      const send = finalDto.forcePn ? engine.sendTextMessageRaw.bind(engine) : engine.sendTextMessage.bind(engine);
       // Keep the 2-arg call shape for plain sends; only pass mentions when the caller supplied any.
       result = finalDto.mentions?.length
         ? await send(finalDto.chatId, finalDto.text, finalDto.mentions)
