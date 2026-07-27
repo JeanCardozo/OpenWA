@@ -6598,6 +6598,11 @@
             "items": {
               "type": "string"
             }
+          },
+          "forcePn": {
+            "type": "boolean",
+            "description": "Force delivery to the raw @c.us phone number without LID resolution",
+            "example": true
           }
         },
         "required": [
